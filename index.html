@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Generator Bookmarklet</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #f9fafb;
+      color: #1f2937;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 45rem;
+      margin: auto;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      color: #374151;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-top: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      padding: 0.5rem;
+      font-size: 0.875rem;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96,165,250,0.5);
+    }
+    select {
+	  margin-top: .5rem;
+      background: #f9fafb;
+      color: #374151;
+      cursor: pointer;
+    }
+    .btn { 
+      margin-top: 0.5rem;
+      background: #3b82f6;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.375rem;
+      cursor: pointer;
+    }
+    .btn:hover { background: #2563eb; }
+    .secondary { background: #6b7280; }
+    .secondary:hover { background: #4b5563; }
+    .output {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+    }
+    #bmResult {
+      font-family: monospace;
+      background: #f3f4f6;
+    }
+    #linkPreview a {
+      display: inline-block;
+      font-weight: 700;
+      text-decoration: none;
+    }
+	.footer {
+		margin-top: 2rem;
+		text-align: center;
+		font-size: 0.875rem;
+		color: #6b7280;
+		}
+		.footer a {
+		color: #3b82f6;
+		font-weight: 600;
+		text-decoration: none;
+		}
+		.footer a:hover {
+		text-decoration: underline;
+		}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔖 Generator Bookmarklet</h2>
+    <label>Nama Bookmark:</label>
+    <input type="text" id="bmName" value="Bookmarklet Baru">
+
+    <label>Kode JavaScript:</label>
+    <textarea id="bmCode" rows="6">alert('Halo dari bookmarklet!')</textarea>
+
+    <div style="display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
+      <select id="contohSelect" style="flex:1; min-width:14rem;">
+        <option value="">-- pilih contoh --</option>
+        <option value="iklan">Penghapus iklan</option>
+        <option value="edit">Mode edit halaman</option>
+        <option value="kata">Penghitung Kata di Halaman</option>
+        <option value="link">Highlighter link</option>
+        <option value="gambar">Bersihkan Semua Gambar</option>
+      </select>
+      <button class="btn secondary" onclick="muatContohTerpilih()">Muat Contoh</button>
+    </div>
+	<button class="btn" onclick="generate()">Generate</button>
+
+    <div class="output">
+      <label style="margin-top: 0;">Hasil Bookmarklet:</label>
+      <textarea id="bmResult" rows="3" readonly></textarea>
+      <div style="margin-top: 0.75rem;" id="linkPreview"></div>
+    </div>
+  </div>
+	<div class="footer">
+	📂 Lihat kode sumber di <a href="https://github.com/danie-lung/generator-bookmarklet" target="_blank">GitHub</a>
+	</div>
+
+  <script>
+    function generate() {
+      const name = document.getElementById('bmName').value.trim() || 'Bookmarklet';
+      let code = document.getElementById('bmCode').value.trim();
+      if (!code) return alert('Masukkan kode JavaScript.');
+      if (!code.startsWith('javascript:')) code = 'javascript:(function(){' + code + '})()';
+      document.getElementById('bmResult').value = code;
+
+      const link = document.createElement('a');
+      link.textContent = name;
+      link.href = code;
+      link.title = 'Seret ke bar Bookmark';
+      const preview = document.getElementById('linkPreview');
+      preview.innerHTML = 'Seret link dibawah ke bilah bookmark Anda: <br>';
+      preview.appendChild(link);
+    }
+
+    const CONTOH = {
+      iklan: `document.querySelectorAll('iframe,[id*="ad"],[class*="ad"]').forEach(el=>el.remove());`,
+      edit: `document.body.contentEditable = true; document.designMode = 'on'; alert('Mode edit aktif!');`,
+      kata: `alert('Jumlah kata: ' + document.body.innerText.trim().split(/\\s+/).filter(Boolean).length);`,
+      link: `document.querySelectorAll('a').forEach(a=>{a.style.background='yellow';a.style.color='red';});`,
+      gambar: `document.querySelectorAll('img').forEach(img=>img.remove());`
+    };
+
+    function muatContohTerpilih(){
+      const sel = document.getElementById('contohSelect').value;
+      if(!sel){ alert('Pilih contoh dulu.'); return; }
+      document.getElementById('bmCode').value = CONTOH[sel];
+    }
+  </script>
+</body>
+</html>
