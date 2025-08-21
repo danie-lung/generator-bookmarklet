@@ -47,6 +47,7 @@
       let code = document.getElementById('bmCode').value.trim();
       if (!code) return alert('Masukkan kode JavaScript.');
       if (!code.startsWith('javascript:')) code = 'javascript:(function(){' + code + '})()';
+	  code = 'javascript:' + encodeURIComponent(code.replace(/^javascript:/, ''));
       document.getElementById('bmResult').value = code;
 
       const link = document.createElement('a');
@@ -75,4 +76,5 @@
   </script>
 </body>
 </html>
+
 
